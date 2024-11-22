@@ -1,0 +1,236 @@
+<div class="space-y-6">
+    <!-- 헤더 -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div class="flex items-center space-x-4">
+            <h2 class="text-2xl font-bold text-gray-900">회원 관리</h2>
+            <div class="relative">
+                <input type="text" 
+                       id="nameSearch" 
+                       placeholder="이름으로 검색" 
+                       class="w-48 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                       onkeyup="filterByName(this.value)">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button onclick="exportToExcel()" class="inline-flex items-center px-4 py-2 border border-primary rounded-md shadow-sm text-sm font-medium text-primary bg-white hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                엑셀 다운로드
+            </button>
+        </div>
+    </div>
+
+    <!-- 회원 목록 -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('member_code')">
+                            회원코드
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('uid')">
+                            아이디
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('name')">
+                            이름
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">연락처</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이메일</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('join_time')">
+                            가입일
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('last_login_time')">
+                            최근로그인
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('point')">
+                            포인트
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% if (members && members.length > 0) { %>
+                        <% members.forEach(member => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <a href="/members/<%= member.member_code %>" class="text-primary hover:underline">
+                                        <%= member.member_code %>
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= member.uid %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= member.name %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= member.callnum || '-' %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= member.email %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= member.join_time %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= member.last_login_time %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= member.point_amount.toLocaleString() %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
+                                회원 데이터가 없습니다.
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <% if (locals.pagination) { %>
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <% if (pagination.current_page > 1) { %>
+                        <a href="?page=<%= pagination.current_page - 1 %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            이전
+                        </a>
+                    <% } %>
+                    <% if (pagination.current_page < pagination.total_page) { %>
+                        <a href="?page=<%= pagination.current_page + 1 %>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            다음
+                        </a>
+                    <% } %>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            전체 <span class="font-medium"><%= pagination.data_count %></span> 건
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <% for(let i = 1; i <= pagination.total_page; i++) { %>
+                                <a href="?page=<%= i %>" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium <%= i === pagination.current_page ? 'text-primary border-primary z-10' : 'text-gray-700 hover:bg-gray-50' %>">
+                                    <%= i %>
+                                </a>
+                            <% } %>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div> 
+
+<script>
+let currentSort = {
+    column: 'member_code',
+    direction: 'asc'
+};
+
+function sortTable(column) {
+    const tbody = document.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    if (currentSort.column === column) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.column = column;
+        currentSort.direction = 'asc';
+    }
+
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch(column) {
+            case 'member_code':
+                aValue = a.querySelector('td:nth-child(1)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(1)').textContent.trim();
+                break;
+            case 'uid':
+                aValue = a.querySelector('td:nth-child(2)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(2)').textContent.trim();
+                break;
+            case 'name':
+                aValue = a.querySelector('td:nth-child(3)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(3)').textContent.trim();
+                break;
+            case 'join_time':
+                aValue = new Date(a.querySelector('td:nth-child(6)').textContent.trim());
+                bValue = new Date(b.querySelector('td:nth-child(6)').textContent.trim());
+                break;
+            case 'last_login_time':
+                aValue = new Date(a.querySelector('td:nth-child(7)').textContent.trim());
+                bValue = new Date(b.querySelector('td:nth-child(7)').textContent.trim());
+                break;
+            case 'point':
+                aValue = parseInt(a.querySelector('td:nth-child(8)').textContent.replace(/[^0-9]/g, ''));
+                bValue = parseInt(b.querySelector('td:nth-child(8)').textContent.replace(/[^0-9]/g, ''));
+                break;
+        }
+
+        if (currentSort.direction === 'asc') {
+            return aValue > bValue ? 1 : -1;
+        } else {
+            return aValue < bValue ? 1 : -1;
+        }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+    updateSortIcons(column);
+}
+
+function updateSortIcons(column) {
+    document.querySelectorAll('.sort-icon').forEach(icon => {
+        icon.textContent = '';
+    });
+    
+    const targetIcon = document.querySelector(`th[onclick="sortTable('${column}')"] .sort-icon`);
+    targetIcon.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+}
+
+function exportToExcel() {
+    const table = document.querySelector('table');
+    const rows = Array.from(table.querySelectorAll('tr'));
+    
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF";  // UTF-8 BOM for Korean
+    
+    // 헤더 추가
+    const headers = ["회원코드", "아이디", "이름", "연락처", "이메일", "가입일", "최근로그인", "포인트"];
+    csvContent += headers.join(",") + "\n";
+    
+    // 데이터 행 추가
+    rows.slice(1).forEach(row => {  // Skip header row
+        const cells = Array.from(row.querySelectorAll('td'));
+        const rowData = cells.map(cell => `"${cell.textContent.replace(/"/g, '""')}"`);
+        csvContent += rowData.join(",") + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "members.csv");
+    document.body.appendChild(link);
+    link.click();
+}
+
+function filterByName(searchText) {
+    const tbody = document.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    rows.forEach(row => {
+        const nameCell = row.querySelector('td:nth-child(3)');
+        if (!nameCell) return;
+        
+        const name = nameCell.textContent.trim().toLowerCase();
+        const searchValue = searchText.toLowerCase();
+        
+        if (name.includes(searchValue)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script> 

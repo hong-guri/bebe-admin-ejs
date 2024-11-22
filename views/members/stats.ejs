@@ -1,0 +1,121 @@
+<div class="space-y-6">
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">회원 통계</h2>
+    </div>
+
+    <% if (locals.error) { %>
+        <div class="rounded-md bg-red-50 p-4">
+            <div class="flex">
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800"><%= error %></h3>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- 전체 회원 수 -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">전체 회원</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900"><%= stats.totalMembers %></div>
+                                    <div class="ml-2 text-sm font-medium text-gray-500">명</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오늘 가입 회원 -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">오늘 가입</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900"><%= stats.newMembersToday %></div>
+                                    <div class="ml-2 text-sm font-medium text-gray-500">명</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 활성 회원 -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">활성 회원</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900"><%= stats.activeMembers %></div>
+                                    <div class="ml-2 text-sm font-medium text-gray-500">명</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 마케팅 동의 현황 -->
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">마케팅 동의 현황</h3>
+                <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">SMS 수신 동의</div>
+                        <div class="mt-1">
+                            <div class="flex items-center">
+                                <div class="flex-1">
+                                    <div class="bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary rounded-full h-2" style="width: <%= (stats.marketingAgreeSMS / stats.totalMembers * 100).toFixed(1) %>%"></div>
+                                    </div>
+                                </div>
+                                <span class="ml-3 text-sm font-medium text-gray-900"><%= (stats.marketingAgreeSMS / stats.totalMembers * 100).toFixed(1) %>%</span>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-500"><%= stats.marketingAgreeSMS %>명</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">이메일 수신 동의</div>
+                        <div class="mt-1">
+                            <div class="flex items-center">
+                                <div class="flex-1">
+                                    <div class="bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary rounded-full h-2" style="width: <%= (stats.marketingAgreeEmail / stats.totalMembers * 100).toFixed(1) %>%"></div>
+                                    </div>
+                                </div>
+                                <span class="ml-3 text-sm font-medium text-gray-900"><%= (stats.marketingAgreeEmail / stats.totalMembers * 100).toFixed(1) %>%</span>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-500"><%= stats.marketingAgreeEmail %>명</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div> 

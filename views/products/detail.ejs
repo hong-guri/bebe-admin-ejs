@@ -1,0 +1,84 @@
+<div class="space-y-6">
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">상품 상세 정보</h2>
+        <div class="mt-4 sm:mt-0">
+            <a href="/products" class="inline-flex items-center px-4 py-2 border border-primary rounded-md shadow-sm text-sm font-medium text-primary bg-white hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                목록으로
+            </a>
+        </div>
+    </div>
+
+    <% if (error) { %>
+        <div class="rounded-md bg-red-50 p-4">
+            <div class="flex">
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800"><%= error %></h3>
+                </div>
+            </div>
+        </div>
+    <% } else if (product) { %>
+        <!-- 상품 정보 -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <!-- 이미지 갤러리 -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="grid grid-cols-4 gap-4">
+                    <% product.imageUrls.forEach(imageUrl => { %>
+                        <div class="aspect-w-1 aspect-h-1">
+                            <img src="<%= imageUrl %>" alt="" class="object-cover rounded-lg">
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- 기본 정보 -->
+            <div class="px-4 py-5 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">기본 정보</h3>
+            </div>
+            <div class="border-t border-gray-200">
+                <dl>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">상품번호</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= product.no %></dd>
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">상품명</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= product.name %></dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">판매가</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= product.price.toLocaleString() %>원</dd>
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">상태</dt>
+                        <dd class="mt-1 sm:mt-0 sm:col-span-2">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                <%= product.prod_status === 'sale' ? 'bg-green-100 text-green-800' : 
+                                   product.prod_status === 'soldout' ? 'bg-red-100 text-red-800' : 
+                                   'bg-gray-100 text-gray-800' %>">
+                                <%= product.prod_status === 'sale' ? '판매중' : 
+                                   product.prod_status === 'soldout' ? '품절' : '숨김' %>
+                            </span>
+                        </dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">재고</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <%= product.stock?.stock_unlimit ? '무제한' : 
+                                product.stock?.stock_no_option?.toLocaleString() || 0 %>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- 상세 설명 -->
+            <div class="px-4 py-5 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">상세 설명</h3>
+            </div>
+            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                <div class="prose max-w-none">
+                    <%- product.content %>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div> 

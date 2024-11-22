@@ -1,0 +1,193 @@
+<div class="space-y-6">
+    <!-- 헤더 -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">상품 관리</h2>
+        <div class="mt-4 sm:mt-0">
+            <a href="/products/new" class="inline-flex items-center px-4 py-2 border border-primary rounded-md shadow-sm text-sm font-medium text-primary bg-white hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                상품 등록
+            </a>
+        </div>
+    </div>
+
+    <!-- 상품 목록 -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('no')">
+                            상품번호
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이미지</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('name')">
+                            상품명
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('price')">
+                            판매가
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('status')">
+                            상태
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable('stock')">
+                            재고
+                            <span class="ml-1 sort-icon"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% if (products && products.length > 0) { %>
+                        <% products.forEach(product => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <a href="/products/<%= product.no %>" class="text-primary hover:underline">
+                                        <%= product.no %>
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <% if (product.imageUrls && product.imageUrls[0]) { %>
+                                        <img src="<%= product.imageUrls[0] %>" alt="<%= product.name %>" class="h-10 w-10 object-cover rounded">
+                                    <% } else { %>
+                                        <div class="h-10 w-10 bg-gray-200 rounded flex items-center justify-center">
+                                            <span class="text-gray-500 text-xs">No Image</span>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= product.name %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= product.price.toLocaleString() %>원</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <%= product.prod_status === 'sale' ? 'bg-green-100 text-green-800' : 
+                                           product.prod_status === 'soldout' ? 'bg-red-100 text-red-800' : 
+                                           'bg-gray-100 text-gray-800' %>">
+                                        <%= product.prod_status === 'sale' ? '판매중' : 
+                                           product.prod_status === 'soldout' ? '품절' : '숨김' %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <%= product.stock?.stock_unlimit ? '무제한' : 
+                                        product.stock?.stock_no_option?.toLocaleString() || 0 %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                                상품 데이터가 없습니다.
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <% if (locals.pagination) { %>
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <% if (pagination.current_page > 1) { %>
+                        <a href="?page=<%= pagination.current_page - 1 %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            이전
+                        </a>
+                    <% } %>
+                    <% if (pagination.current_page < pagination.total_page) { %>
+                        <a href="?page=<%= pagination.current_page + 1 %>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            다음
+                        </a>
+                    <% } %>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            전체 <span class="font-medium"><%= pagination.data_count %></span> 건
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <% for(let i = 1; i <= pagination.total_page; i++) { %>
+                                <a href="?page=<%= i %>" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium <%= i === pagination.current_page ? 'text-primary border-primary z-10' : 'text-gray-700 hover:bg-gray-50' %>">
+                                    <%= i %>
+                                </a>
+                            <% } %>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+let currentSort = {
+    column: 'no',
+    direction: 'asc'
+};
+
+function sortTable(column) {
+    const tbody = document.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // 정렬 방향 결정
+    if (currentSort.column === column) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.column = column;
+        currentSort.direction = 'asc';
+    }
+
+    // 정렬 함수
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch(column) {
+            case 'no':
+                aValue = parseInt(a.querySelector('td:nth-child(1)').textContent.trim());
+                bValue = parseInt(b.querySelector('td:nth-child(1)').textContent.trim());
+                break;
+            case 'name':
+                aValue = a.querySelector('td:nth-child(3)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(3)').textContent.trim();
+                break;
+            case 'price':
+                aValue = parseInt(a.querySelector('td:nth-child(4)').textContent.replace(/[^0-9]/g, ''));
+                bValue = parseInt(b.querySelector('td:nth-child(4)').textContent.replace(/[^0-9]/g, ''));
+                break;
+            case 'status':
+                aValue = a.querySelector('td:nth-child(5)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(5)').textContent.trim();
+                break;
+            case 'stock':
+                aValue = a.querySelector('td:nth-child(6)').textContent.trim() === '무제한' ? Infinity : 
+                        parseInt(a.querySelector('td:nth-child(6)').textContent.replace(/[^0-9]/g, ''));
+                bValue = b.querySelector('td:nth-child(6)').textContent.trim() === '무제한' ? Infinity : 
+                        parseInt(b.querySelector('td:nth-child(6)').textContent.replace(/[^0-9]/g, ''));
+                break;
+        }
+
+        if (currentSort.direction === 'asc') {
+            return aValue > bValue ? 1 : -1;
+        } else {
+            return aValue < bValue ? 1 : -1;
+        }
+    });
+
+    // 정렬된 행을 다시 테이블에 추가
+    rows.forEach(row => tbody.appendChild(row));
+
+    // 정렬 아이콘 업데이트
+    updateSortIcons(column);
+}
+
+function updateSortIcons(column) {
+    document.querySelectorAll('.sort-icon').forEach(icon => {
+        icon.textContent = '';
+    });
+    
+    const targetIcon = document.querySelector(`th[onclick="sortTable('${column}')"] .sort-icon`);
+    targetIcon.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+}
+</script>
